@@ -39,7 +39,6 @@ class App extends Component {
   }
 
   onReceiveMessage = (evt) => {
-    // todo check current slide
     if (!!evt.data.file) {
       this.setState({ file: evt.data.file })
     }
@@ -133,21 +132,28 @@ class App extends Component {
   }
 
   showPrevSlide() {
-    let { pages, currentPage, numPages, preloadPages, secondWindow, mainPage, secondWindowSlideWidth, width } = this.state;
+    let { pages, currentPage, secondWindow, mainPage, secondWindowSlideWidth, width } = this.state;
 
     if (currentPage <= 1) {
       return null;
     }
 
     currentPage -= 1;
-    pages.unshift(this.renderPage(currentPage, width));
     pages.pop();
 
     if (secondWindow && mainPage) {
       secondWindow.postMessage('prevSlide', '*');
     }
 
-    this.setState({ currentPage });
+    if (mainPage) {
+      pages.unshift(this.renderPage(currentPage, width));
+    }
+
+    if (!mainPage) {
+      pages.unshift(this.renderPage(currentPage, secondWindowSlideWidth));
+    }
+
+    this.setState({ currentPage, pages });
   }
 
   renderPage(num, width) {
