@@ -101,6 +101,12 @@ class App extends Component {
 
   };
 
+  onResolutionChange = (evt) => {
+    const width = +evt.target.value;
+    const height = width / 16 * 9;
+    this.setState({ width, height });
+  };
+
   showNextSlide() {
     let { pages, currentPage, numPages, preloadPages, secondWindow, mainPage, secondWindowSlideWidth, width } = this.state;
 
@@ -160,11 +166,20 @@ class App extends Component {
 
     const loadInput = (
       <div className="pagesContainer">
+        <div>
+          <p>Какой размер у основного экрана?</p>
+          <select onChange={this.onResolutionChange}>
+            <option value="2560">2560x1440</option>
+            <option value="1920" defaultValue>1920x1080</option>
+          </select>
+        </div>
+
         <label htmlFor="file">Load from file:</label>&nbsp;
         <input
           type="file"
           onChange={this.onInputChange}
         />
+
       </div>
     );
 
