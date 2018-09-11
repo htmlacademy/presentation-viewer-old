@@ -1,0 +1,85 @@
+.header {
+  width: 100%;
+  background-color: #dad9d7;
+}
+.header__inner {
+  width: 1200px;
+  padding: 17px 10px;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+}
+.button {
+  padding: 0;
+  border: 0;
+  font-size: 0;
+  outline: none;
+  margin-right: 36px;
+  display: flex;
+  background-color: transparent;
+}
+.button:hover {
+  opacity: 0.6;
+}
+.button:focus {
+  opacity: 0.5;
+}
+.button:disabled {
+  opacity: 0.2;
+}
+.pdf-loader-input {
+  display: none;
+}
+.pdf-loader {
+  width: 36px;
+  height: 36px;
+  background-image: url(./pdf.png);
+}
+.new-window {
+  width: 43px;
+  height: 35px;
+  background-image: url(./new-window.png);
+}
+.sync-pages {
+  width: 28px;
+  height: 36px;
+  background-image: url(./sync.png);
+}
+.prev-slide {
+  width: 30px;
+  height: 36px;
+  margin-right: 13px;
+  background-image: url(./arrow.png);
+}
+.next-slide {
+  width: 30px;
+  height: 36px;
+  background-image: url(./arrow.png);
+  transform: rotate(180deg);
+}
+.full-screen {
+  width: 36px;
+  height: 36px;
+  background-image: url(./fullscreen.png);
+}
+.current-slide-wrap {
+  display: flex;
+  align-items: baseline;
+  font-size: 16px;
+}
+.current-slide {
+  width: 36px;
+  height: 36px;
+  background-color: #efefef;
+  border: none;
+  border-radius: 5px;
+  margin-right: 10px;
+  text-align: center;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+.page-count {
+  margin-left: 10px;
+  margin-right: 36px;
+}

@@ -1,0 +1,34 @@
+.sidebar {
+  width: 280px;
+  background-color: #dad9d7;
+  display: flex;
+  flex-direction: column;
+  height: 85vh;
+  overflow: auto;
+}
+.sidebar__title {
+  position: relative;
+  text-align: center;
+  padding-left: 46px;
+  font-size: 24px;
+  line-height: 36px;
+  align-self: center;
+}
+.sidebar__title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 29px;
+  height: 36px;
+  background-image: url(./pages.png);
+}
+.mini-pages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.mini-page {
+  margin-bottom: 30px;
+}
+
