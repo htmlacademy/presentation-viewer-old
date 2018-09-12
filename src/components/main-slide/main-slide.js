@@ -4,24 +4,24 @@ import {Document} from "react-pdf/dist/entry.webpack";
 
 class MainSlide extends Component {
   componentDidMount() {
-    this.props.setSize(this.pdfWrapper);
-    document.addEventListener('webkitfullscreenchange', this.onChangeFullScreen, false);
+    this.props.setContainerWidth(this.pdfWrapper.getBoundingClientRect().width);
+    document.addEventListener('webkitfullscreenchange', this.onExitFullScreen, false);
   }
 
   componentWillUnmount() {
-    document.removeEventListener('webkitfullscreenchange', this.onChangeFullScreen);
+    document.removeEventListener('webkitfullscreenchange', this.onExitFullScreen);
   }
 
   componentDidUpdate() {
-    if (this.props.fullScreenMode) {
+    if (this.props.needFullScreen) {
+      this.props.onFullScreenEnter();
       this.pdfWrapper.webkitRequestFullscreen();
     }
   }
-  // todo fix black screen when go on 5+ full screen
-  onChangeFullScreen = () => {
+
+  onExitFullScreen = () => {
     if (!document.webkitIsFullScreen) {
       this.props.onFullScreenExit();
-      this.props.setSize(this.pdfWrapper);
     }
   };
 

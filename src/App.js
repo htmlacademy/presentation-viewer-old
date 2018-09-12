@@ -12,9 +12,11 @@ class App extends PureComponent {
     file: null,
     numPages: null,
     secondWindow: null,
-    width: null,
     mainPage: true,
     fullScreenMode: false,
+    needFullScreen: false,
+    fullScreenWidth: null,
+    containerWidth: null,
     secondWindowSlideWidth: 300,
     currentPage: 1,
     preloadPages: 5,
@@ -24,6 +26,7 @@ class App extends PureComponent {
 
   componentDidMount() {
     const mainPage = window.name !== 'secondWindow';
+    const fullScreenWidth = window.screen.width;
 
     if (mainPage) {
       window.addEventListener('keydown', this.onKeyDown);
@@ -33,7 +36,7 @@ class App extends PureComponent {
       window.addEventListener('message', this.onReceiveMessage);
     }
 
-    this.setState({ mainPage });
+    this.setState({ mainPage, fullScreenWidth });
   };
 
   componentWillUnmount() {
@@ -42,20 +45,24 @@ class App extends PureComponent {
   }
 
   onReceiveMessage = (evt) => {
-    // todo check current slide
+    const { secondWindowSlideWidth } = this.state;
+
     if (!!evt.data.file) {
       this.setState({ file: evt.data.file })
     }
+    if (!!evt.data.currentPage) {
+      this.setState({ currentPage: evt.data.currentPage })
+    }
     if (evt.data === 'nextSlide') {
-      this.showNextSlide();
+      this.showNextSlide(secondWindowSlideWidth);
     }
     if (evt.data === 'prevSlide') {
-      this.showPrevSlide();
+      this.showPrevSlide(secondWindowSlideWidth);
     }
   };
 
   onDocumentLoad = ({ numPages }) => {
-    const { mainPage } = this.state;
+    const { mainPage, containerWidth, secondWindowSlideWidth } = this.state;
     const miniPages = [];
 
     if (mainPage) {
@@ -64,8 +71,9 @@ class App extends PureComponent {
       }
     }
 
-    this.preloadSlides();
-    this.setState({ numPages, miniPages });
+    const width = mainPage ? containerWidth : secondWindowSlideWidth;
+    const pages = this.preloadSlides(width, numPages);
+    this.setState({ numPages, miniPages, pages });
   };
 
   onInputChange = (evt) => {
@@ -76,47 +84,67 @@ class App extends PureComponent {
     }
   };
 
-  onFullScreenClick = (evt) => {
-    const fullScreenMode = true;
-    const width = window.screen.width;
-    this.preloadSlides(width);
+  onFullScreenBtnClick = () => {
+    const needFullScreen = true;
+    const pages = this.preloadSlides(this.state.fullScreenWidth);
 
-    this.setState({ width, fullScreenMode });
+    this.setState({ needFullScreen, pages });
   };
 
   onFullScreenExit = () => {
     const fullScreenMode = false;
-    this.preloadSlides();
-    this.setState({ fullScreenMode });
+    const pages = this.preloadSlides(this.state.containerWidth);
+    this.setState({ fullScreenMode, pages });
+  };
+
+  onFullScreenEnter = () => {
+    const fullScreenMode = true;
+    const needFullScreen = false;
+    const pages = this.preloadSlides(this.state.fullScreenWidth);
+    this.setState({ fullScreenMode, needFullScreen, pages })
   };
 
   onKeyDown = (evt) => {
-    if (evt.key === 'ArrowRight') {
-      this.showNextSlide();
+    const { mainPage, containerWidth, fullScreenWidth, fullScreenMode } = this.state;
+
+    if (evt.key === 'ArrowRight' && mainPage) {
+      const width = fullScreenMode ? fullScreenWidth : containerWidth;
+      this.showNextSlide(width);
     }
 
     if (evt.key === 'ArrowLeft') {
-      this.showPrevSlide();
+      const width = fullScreenMode ? fullScreenWidth : containerWidth;
+      this.showPrevSlide(width);
     }
 
     if (evt.key === 'n' || evt.key === 'т') {
+      const { file, currentPage } = this.state;
       const secondWindow = window.open('.', 'secondWindow');
+
+      if (file) {
+        setTimeout(() => {
+          secondWindow.postMessage({ file }, '*');
+          secondWindow.postMessage({ currentPage }, '*');
+        }, 3000);
+      }
+
 
       this.setState({ secondWindow });
     }
 
     if (evt.key === 'm'|| evt.key === 'ь') {
-      const { secondWindow, file } = this.state;
+      const { secondWindow, file, currentPage } = this.state;
 
       if (secondWindow && file) {
         secondWindow.postMessage({ file }, '*');
+        secondWindow.postMessage({ currentPage }, '*');
       }
     }
 
   };
 
-  showNextSlide() {
-    let { pages, currentPage, numPages, preloadPages, secondWindow, mainPage, secondWindowSlideWidth, width } = this.state;
+  showNextSlide(width) {
+    let { pages, currentPage, numPages, preloadPages, secondWindow, mainPage } = this.state;
 
     if (currentPage >= numPages) {
       return null;
@@ -126,11 +154,8 @@ class App extends PureComponent {
     currentPage += 1;
     pages.shift();
 
-    if (nextPreloadSlide <= numPages && mainPage) {
+    if (nextPreloadSlide <= numPages) {
       pages.push(this.renderPage(nextPreloadSlide, width));
-    }
-    if (nextPreloadSlide <= numPages && !mainPage) {
-      pages.push(this.renderPage(nextPreloadSlide, secondWindowSlideWidth));
     }
 
     if (secondWindow && mainPage) {
@@ -140,41 +165,42 @@ class App extends PureComponent {
     this.setState({ currentPage, pages })
   }
 
-  showPrevSlide() {
-    // todo black screen when go back on last slide
-    let { pages, currentPage, secondWindow, mainPage, secondWindowSlideWidth, width } = this.state;
+  showPrevSlide(width) {
+    let { pages, currentPage, numPages, secondWindow, mainPage, preloadPages } = this.state;
 
     if (currentPage <= 1) {
       return null;
     }
 
     currentPage -= 1;
-    pages.pop();
+    const pagesLeft = numPages - currentPage;
+
+    if (pagesLeft < preloadPages) {
+      pages.unshift(this.renderPage(currentPage, width));
+    } else {
+      pages.pop();
+      pages.unshift(this.renderPage(currentPage, width));
+    }
 
     if (secondWindow && mainPage) {
       secondWindow.postMessage('prevSlide', '*');
     }
 
-    if (mainPage) {
-      pages.unshift(this.renderPage(currentPage, width));
-    }
-
-    if (!mainPage) {
-      pages.unshift(this.renderPage(currentPage, secondWindowSlideWidth));
-    }
-
     this.setState({ currentPage, pages });
   }
 
-  preloadSlides = (width = this.state.width) => {
+  //todo separate styles for main and second pages
+  preloadSlides = (width, numPages = this.state.numPages) => {
     const { preloadPages, currentPage } = this.state;
     const pages = [];
+    const pageLeft = numPages - currentPage;
+    const numIterate = pageLeft < preloadPages ? pageLeft + 1: preloadPages;
 
-    for (let i = currentPage; i <= preloadPages; i++) {
-      pages.push(this.renderPage(i, width, 'main-slide'));
+    for (let i = 0; i < numIterate; i++) {
+      pages.push(this.renderPage(i + currentPage, width, 'main-slide'));
     }
 
-    this.setState({ pages });
+    return pages;
   };
 
   renderPage(num, width, className='') {
@@ -189,14 +215,12 @@ class App extends PureComponent {
     )
   }
 
-  setSize = (el) => {
-    const width = el.getBoundingClientRect().width;
-    this.preloadSlides(width);
-    this.setState({ width });
+  setContainerWidth = (containerWidth) => {
+    this.setState({ containerWidth });
   };
 
   render() {
-    const { file, mainPage, pages, miniPages, fullScreenMode, numPages, currentPage, secondWindow } = this.state;
+    const { file, mainPage, pages, miniPages, needFullScreen, numPages, currentPage, secondWindow } = this.state;
 
     const mainWindow = (
       <section>
@@ -205,7 +229,7 @@ class App extends PureComponent {
                 file={file}
                 secondWindow={secondWindow}
                 onInputChange={this.onInputChange}
-                onFullScreenClick={this.onFullScreenClick}
+                onFullScreenBtnClick={this.onFullScreenBtnClick}
         />
         <div className="main-wrap">
           <Sidebar file={file}
@@ -213,8 +237,9 @@ class App extends PureComponent {
           />
           <MainSlide file={file}
                      pages={pages}
-                     setSize={this.setSize}
-                     fullScreenMode={fullScreenMode}
+                     needFullScreen={needFullScreen}
+                     setContainerWidth={this.setContainerWidth}
+                     onFullScreenEnter={this.onFullScreenEnter}
                      onFullScreenExit={this.onFullScreenExit}
           />
         </div>

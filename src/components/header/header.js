@@ -3,7 +3,7 @@ import './header.css';
 
 class Header extends PureComponent {
   render() {
-    const {file, numPages, onFullScreenClick, currentPage, secondWindow} = this.props;
+    const {file, numPages, onFullScreenBtnClick, currentPage, secondWindow} = this.props;
 
     return (
       <header className="header">
@@ -18,7 +18,7 @@ class Header extends PureComponent {
             <input type="text" className="current-slide" disabled={!file} value={file ? currentPage: 0}/>
             / <span className="page-count">{numPages ? numPages : 0}</span>
           </div>
-          <button className="button full-screen" type="button" disabled={!file} onClick={onFullScreenClick}>Full screen</button>
+          <button className="button full-screen" type="button" disabled={!file} onClick={onFullScreenBtnClick}>Full screen</button>
         </div>
       </header>
     );
