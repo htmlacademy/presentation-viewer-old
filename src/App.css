@@ -9,3 +9,19 @@
   display: flex;
   justify-content: space-between;
 }
+.second-window {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  align-items: center;
+  padding-top: 20px;
+  box-sizing: border-box;
+}
+.second-page-slides {
+  margin-bottom: 15px;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+.second-page-slides:first-of-type {
+  border: 3px solid red;
+}
