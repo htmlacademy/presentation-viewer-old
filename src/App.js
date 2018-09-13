@@ -17,7 +17,7 @@ class App extends PureComponent {
     needFullScreen: false,
     fullScreenWidth: null,
     containerWidth: null,
-    secondWindowSlideWidth: 300,
+    secondWindowSlideWidth: 350,
     currentPage: 1,
     preloadPages: 5,
     pages: [],
@@ -145,6 +145,7 @@ class App extends PureComponent {
 
   showNextSlide(width) {
     let { pages, currentPage, numPages, preloadPages, secondWindow, mainPage } = this.state;
+    const className = mainPage ? 'main-slide' : 'second-page-slides';
 
     if (currentPage >= numPages) {
       return null;
@@ -155,7 +156,7 @@ class App extends PureComponent {
     pages.shift();
 
     if (nextPreloadSlide <= numPages) {
-      pages.push(this.renderPage(nextPreloadSlide, width));
+      pages.push(this.renderPage(nextPreloadSlide, width, className));
     }
 
     if (secondWindow && mainPage) {
@@ -167,6 +168,7 @@ class App extends PureComponent {
 
   showPrevSlide(width) {
     let { pages, currentPage, numPages, secondWindow, mainPage, preloadPages } = this.state;
+    const className = mainPage ? 'main-slide' : 'second-page-slides';
 
     if (currentPage <= 1) {
       return null;
@@ -176,10 +178,10 @@ class App extends PureComponent {
     const pagesLeft = numPages - currentPage;
 
     if (pagesLeft < preloadPages) {
-      pages.unshift(this.renderPage(currentPage, width));
+      pages.unshift(this.renderPage(currentPage, width, className));
     } else {
       pages.pop();
-      pages.unshift(this.renderPage(currentPage, width));
+      pages.unshift(this.renderPage(currentPage, width, className));
     }
 
     if (secondWindow && mainPage) {
@@ -189,15 +191,15 @@ class App extends PureComponent {
     this.setState({ currentPage, pages });
   }
 
-  //todo separate styles for main and second pages
   preloadSlides = (width, numPages = this.state.numPages) => {
-    const { preloadPages, currentPage } = this.state;
+    const { preloadPages, currentPage, mainPage } = this.state;
     const pages = [];
     const pageLeft = numPages - currentPage;
     const numIterate = pageLeft < preloadPages ? pageLeft + 1: preloadPages;
+    const className = mainPage ? 'main-slide' : 'second-page-slides';
 
     for (let i = 0; i < numIterate; i++) {
-      pages.push(this.renderPage(i + currentPage, width, 'main-slide'));
+      pages.push(this.renderPage(i + currentPage, width, className));
     }
 
     return pages;
@@ -257,7 +259,7 @@ class App extends PureComponent {
         file={file}
         onLoadSuccess={this.onDocumentLoad}
       >
-        <div>{this.state.pages}</div>
+        <div className="second-window">{this.state.pages}</div>
       </Document>
     );
 
