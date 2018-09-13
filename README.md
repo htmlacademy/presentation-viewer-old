@@ -1,4 +1,4 @@
-#presentation-viewer
+# presentation-viewer
 
 Программа для просмотра презентаций с возможностью показывать следующие слайды в отдельном окне.
 
@@ -11,7 +11,7 @@ npm i
 ```bash
 npm start
 ```
-###Деплой в gh-pages
+### Деплой в gh-pages
 ```bash
 npm run deploy
 ```
