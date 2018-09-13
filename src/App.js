@@ -118,6 +118,15 @@ class App extends PureComponent {
     this.setState({ secondWindow });
   };
 
+  onSyncFiles = () => {
+    const { secondWindow, file, currentPage } = this.state;
+
+    if (secondWindow && file) {
+      secondWindow.postMessage({ file }, '*');
+      secondWindow.postMessage({ currentPage }, '*');
+    }
+  };
+
   onKeyDown = (evt) => {
     const { mainPage, containerWidth, fullScreenWidth, fullScreenMode } = this.state;
 
@@ -136,12 +145,7 @@ class App extends PureComponent {
     }
 
     if (evt.key === 'm'|| evt.key === 'ь') {
-      const { secondWindow, file, currentPage } = this.state;
-
-      if (secondWindow && file) {
-        secondWindow.postMessage({ file }, '*');
-        secondWindow.postMessage({ currentPage }, '*');
-      }
+      this.onSyncFiles();
     }
 
   };
@@ -236,6 +240,7 @@ class App extends PureComponent {
                 onInputChange={this.onInputChange}
                 onFullScreenBtnClick={this.onFullScreenBtnClick}
                 onNewWindowOpen={this.onNewWindowOpen}
+                onSyncFiles={this.onSyncFiles}
         />
         <div className="main-wrap">
           <Sidebar file={file}

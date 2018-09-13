@@ -11,7 +11,7 @@ class Header extends PureComponent {
           <input className="pdf-loader-input" id="pdf-loader-input" type="file" onChange={this.props.onInputChange} />
           <label htmlFor="pdf-loader-input" className=" button pdf-loader">Загрузить pdf</label>
           <button className="button new-window" type="button" onClick={this.props.onNewWindowOpen}>Открыть новую вкладку</button>
-          <button className="button sync-pages" disabled={!secondWindow} type="button">Синхронизировать вкладки</button>
+          <button className="button sync-pages" disabled={!secondWindow} type="button" onClick={this.props.onSyncFiles}>Синхронизировать вкладки</button>
           <button className="button prev-slide" disabled={!file} type="button">Предыдущий слайд</button>
           <button className="button next-slide" disabled={!file} type="button">Следующий слайд</button>
           <div className="current-slide-wrap">
