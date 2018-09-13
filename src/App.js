@@ -17,7 +17,7 @@ class App extends PureComponent {
     needFullScreen: false,
     fullScreenWidth: null,
     containerWidth: null,
-    secondWindowSlideWidth: 350,
+    secondWindowSlideWidth: 400,
     currentPage: 1,
     preloadPages: 5,
     pages: [],
