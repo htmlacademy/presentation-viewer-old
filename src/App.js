@@ -104,6 +104,20 @@ class App extends PureComponent {
     this.setState({ fullScreenMode, needFullScreen, pages })
   };
 
+  onNewWindowOpen = () => {
+    const { file, currentPage } = this.state;
+    const secondWindow = window.open('.', 'secondWindow');
+
+    if (file) {
+      setTimeout(() => {
+        secondWindow.postMessage({ file }, '*');
+        secondWindow.postMessage({ currentPage }, '*');
+      }, 3000);
+    }
+
+    this.setState({ secondWindow });
+  };
+
   onKeyDown = (evt) => {
     const { mainPage, containerWidth, fullScreenWidth, fullScreenMode } = this.state;
 
@@ -118,18 +132,7 @@ class App extends PureComponent {
     }
 
     if (evt.key === 'n' || evt.key === 'т') {
-      const { file, currentPage } = this.state;
-      const secondWindow = window.open('.', 'secondWindow');
-
-      if (file) {
-        setTimeout(() => {
-          secondWindow.postMessage({ file }, '*');
-          secondWindow.postMessage({ currentPage }, '*');
-        }, 3000);
-      }
-
-
-      this.setState({ secondWindow });
+      this.onNewWindowOpen();
     }
 
     if (evt.key === 'm'|| evt.key === 'ь') {
@@ -232,6 +235,7 @@ class App extends PureComponent {
                 secondWindow={secondWindow}
                 onInputChange={this.onInputChange}
                 onFullScreenBtnClick={this.onFullScreenBtnClick}
+                onNewWindowOpen={this.onNewWindowOpen}
         />
         <div className="main-wrap">
           <Sidebar file={file}
